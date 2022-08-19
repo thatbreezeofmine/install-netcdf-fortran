@@ -23,7 +23,21 @@ set -e
 #    Daniel Santiago
 #    github/dspelaez
 #
+#  Edit:
+#    Added the installation of gfortran and gcc compilers
+#
+#  Editor:
+#    Nassim Chabchi
+#    github/thatbreezeofmine
+#
 # ============================================================================
+
+# install compilers
+apt-get update
+apt-get install build-essential -y
+apt-get install gfortran -y
+apt-get install m4 -y
+
 
 ## define compilers
 CC=${CC:-gcc}
@@ -41,7 +55,7 @@ H5TAG="1.10.1"
 NCTAG="4.6.1"
 NFTAG="4.4.4"
 
-## donwload source code of depencies
+# ## donwload source code of depencies
 wget -nc -nv https://curl.haxx.se/download/curl-$CLTAG.tar.gz
 wget -nc -nv https://zlib.net/fossils/zlib-$ZLTAG.tar.gz
 wget -nc -nv https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-$H5TAG/src/hdf5-$H5TAG.tar 
@@ -91,16 +105,17 @@ cd netcdf-$NCTAG/
 NCDIR=$MAINDIR
 echo " --->> Compiling netcdf-$NCTAG"
 CPPFLAGS=-I${H5DIR}/include LDFLAGS=-L${H5DIR}/lib ./configure --prefix=${NCDIR} > config.log 2>&1
-make -j4 > config.log 2>&1
-make install > config.log 2>&1
+make -j4
+make install
 cd ..
 rm -rf netcdf-$NCTAG
 
 ## netcdf4-fortran
 tar -xf netcdf-fortran-$NFTAG.tar.gz
 cd netcdf-fortran-$NFTAG/
+NFDIR=$MAINDIR
 echo " --->> Compiling netcdf-fortran-$NFTAG"
-CPPFLAGS=-I${NCDIR}/include LDFLAGS=-L${NCDIR}/lib ./configure --prefix=${NCDIR} > config.log 2>&1
+CPPFLAGS=-I${NFDIR}/include LDFLAGS=-L${NFDIR}/lib ./configure --prefix=${NFDIR} > config.log 2>&1
 make -j4 > config.log 2>&1
 make install > config.log 2>&1
 cd ..
@@ -113,6 +128,5 @@ echo ""
 echo ===============================================================================
 echo "Finally, you must add this to the .profile (or .bashrc or .zshrc) file"
 echo "  Linux --\>" export LD_LIBRARY_PATH=$NCDIR/lib:'$LD_LIBRARY_PATH'
-echo "  OSX   --\>" export DYLD_LIBRARY_PATH=$NCDIR/lib:'$DYLD_LIBRARY_PATH'
 echo ===============================================================================
 echo ""
